@@ -1,0 +1,16 @@
+
+
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: surfers-location
+  #namespace: default
+spec:
+  type: url
+  targets:
+    - ./catalog-users.yaml
+    - ./catalog-domain.yaml
+    - ./catalog-system.yaml
+    - ./catalog-component-db.yaml
+    - ./catalog-component-backend.yaml
+    - ./catalog-component-frontend.yaml

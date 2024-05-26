@@ -1,0 +1,11 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: team-access
+type: kubernetes.io/basic-auth
+stringData:
+  username: #@ data.values.imported[data.values.name].username
+  password: #@ data.values.imported[data.values.name].password
+  

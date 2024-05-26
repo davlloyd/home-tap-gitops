@@ -1,0 +1,169 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterSupplyChain
+metadata:
+  name: kyc-master-supply-chain
+spec:
+  params:
+  - name: maven_repository_url
+    value: https://repo.maven.apache.org/maven2
+  - default: main
+    name: gitops_branch
+  - default: supplychain
+    name: gitops_user_name
+  - default: supplychain
+    name: gitops_user_email
+  - default: supplychain@cluster.local
+    name: gitops_commit_message
+  - default: "git"
+    name: gitops_ssh_secret
+  resources:
+  - name: data-provider
+    params:
+    - default: default
+      name: serviceAccount
+    - default: libgit2
+      name: gitImplementation
+    templateRef:
+      kind: ClusterSourceTemplate
+      name: source-template
+  - name: data-validation
+    sources:
+    - name: source
+      resource: data-provider
+    templateRef:
+      kind: ClusterSourceTemplate
+      name: testing-pipeline
+  - name: risk-assessment
+    params:
+    - default: scan-policy
+      name: scanning_source_policy
+    - default: blob-source-scan-template
+      name: scanning_source_template
+    sources:
+    - name: source
+      resource: data-validation
+    templateRef:
+      kind: ClusterSourceTemplate
+      name: source-scanner-template
+  - name: customer-due-dilligence
+    params:
+    - name: serviceAccount
+      value: default
+    - name: registry
+      value:
+        ca_cert_data: ""
+        repository: lloyd-266015/supply-chain
+        server: us.gcr.io
+    - default: default
+      name: clusterBuilder
+    - default: ./Dockerfile
+      name: dockerfile
+    - default: ./
+      name: docker_build_context
+    - default: []
+      name: docker_build_extra_args
+    sources:
+    - name: source
+      resource: risk-assessment
+    templateRef:
+      kind: ClusterImageTemplate
+      options:
+      - name: kpack-template
+        selector:
+          matchFields:
+          - key: spec.params[?(@.name=="dockerfile")]
+            operator: DoesNotExist
+      - name: kaniko-template
+        selector:
+          matchFields:
+          - key: spec.params[?(@.name=="dockerfile")]
+            operator: Exists
+  - images:
+    - name: image
+      resource: customer-due-dilligence
+    name: kyc-database-checks
+    params:
+    - default: scan-policy
+      name: scanning_image_policy
+    - default: private-image-scan-template
+      name: scanning_image_template
+    templateRef:
+      kind: ClusterImageTemplate
+      name: image-scanner-template
+  - images:
+    - name: image
+      resource: kyc-database-checks
+    name: screening
+    params:
+    - name: serviceAccount
+      value: default
+    templateRef:
+      kind: ClusterConfigTemplate
+      name: convention-template
+  - configs:
+    - name: config
+      resource: screening
+    name: attach-watchers
+    templateRef:
+      kind: ClusterConfigTemplate
+      options:
+      - name: config-template
+        selector:
+          matchLabels:
+            apps.tanzu.vmware.com/workload-type: web
+      - name: server-template
+        selector:
+          matchLabels:
+            apps.tanzu.vmware.com/workload-type: server
+      - name: worker-template
+        selector:
+          matchLabels:
+            apps.tanzu.vmware.com/workload-type: worker
+  - configs:
+    - name: app_def
+      resource: attach-watchers
+    name: external-notification
+    templateRef:
+      kind: ClusterConfigTemplate
+      name: service-bindings
+  - configs:
+    - name: app_def
+      resource: external-notification
+    name: external-screener-check
+    templateRef:
+      kind: ClusterConfigTemplate
+      name: api-descriptors
+  - configs:
+    - name: config
+      resource: external-screener-check
+    name: final-confirmation
+    params:
+    - name: serviceAccount
+      value: default
+    - name: registry
+      value:
+        ca_cert_data: ""
+        repository: lloyd-266015/supply-chain
+        server: us.gcr.io
+    templateRef:
+      kind: ClusterTemplate
+      name: config-writer-template
+  - name: reporting-confirmation
+    params:
+    - name: registry
+      value:
+        ca_cert_data: ""
+        repository: lloyd-266015/supply-chain
+        server: us.gcr.io
+    templateRef:
+      kind: ClusterTemplate
+      name: deliverable-template
+  selector:
+    big-bank: "kyc"
+  selectorMatchExpressions:
+  - key: apps.tanzu.vmware.com/workload-type
+    operator: In
+    values:
+    - web
+    - server
+    - worker

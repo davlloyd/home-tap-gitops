@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: surfers-domain
+  description: All related entities aligned to surfers systems
+spec:
+  owner: group:surfers-crew
+
+---

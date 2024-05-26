@@ -1,0 +1,7 @@
+site_name: 'SurfersLookout System'
+repo_url: https://github.com/davlloyd/surfers-gitops
+repo_name: Github
+docs_dir: docs
+nav:
+  - Frontend: https://github.com/davlloyd/surfers-web/blob/main/docs/index.md
+  - Backend: https://github.com/davlloyd/surfers-api/blob/main/docs/index.md

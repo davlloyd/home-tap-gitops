@@ -1,0 +1,54 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterConfigTemplate
+metadata:
+  annotations:
+    doc: |
+      This template consumes an input named config which contains a
+      PodTemplateSpec and returns a ConfigMap which contains a
+      "delivery.yml" which contains a manifests for a Kubernetes
+      Deployment which will run the templated pod, and a "service.yml"
+      Kubernetes Service to expose the pods on the network.
+  name: server-template
+spec:
+  configPath: .data
+  healthRule:
+    alwaysHealthy: {}
+  params:
+  - default:
+    - containerPort: 8080
+      name: http
+      port: 8080
+    name: ports
+  ytt: "#@ load(\"@ytt:data\", \"data\")\n#@ load(\"@ytt:yaml\", \"yaml\")\n#@ load(\"@ytt:struct\",
+    \"struct\")\n#@ load(\"@ytt:assert\", \"assert\")\n\n#@ def merge_labels(fixed_values):\n#@
+    \  labels = {}\n#@   if hasattr(data.values.workload.metadata, \"labels\"):\n#@
+    \    labels.update(data.values.workload.metadata.labels)\n#@   end\n#@   labels.update(fixed_values)\n#@
+    \  return labels\n#@ end\n\n#@ def intOrString(v):\n#@   return v if type(v) ==
+    \"int\" else int(v.strip()) if v.strip().isdigit() else v\n#@ end\n\n#@ def merge_ports(ports_spec,
+    containers):\n#@   ports = {}\n#@   for c in containers:\n#@     for p in getattr(c,
+    \"ports\", []):\n#@       ports[p.containerPort] = {\"targetPort\": p.containerPort,
+    \"port\": p.containerPort, \"name\": getattr(p, \"name\", str(p.containerPort))}\n#@
+    \    end\n#@   end\n#@   for p in ports_spec:\n#@     targetPort = getattr(p,
+    \"containerPort\", p.port)\n#@     type(targetPort) in (\"string\", \"int\") or
+    fail(\"containerPort must be a string or int\")\n#@     targetPort = intOrString(targetPort)\n#@
+    \    \n#@     port = p.port\n#@     type(port) in (\"string\", \"int\") or fail(\"port
+    must be a string or int\")\n#@     port = int(port)\n#@     ports[p.port] = {\"targetPort\":
+    targetPort, \"port\": port, \"name\": getattr(p, \"name\", str(p.port))}\n#@   end\n#@
+    \  return ports.values()\n#@ end\n\n#@ def delivery():\n---\napiVersion: apps/v1\nkind:
+    Deployment\nmetadata:\n  name: #@ data.values.workload.metadata.name\n  annotations:\n
+    \   kapp.k14s.io/update-strategy: \"fallback-on-replace\"\n    ootb.apps.tanzu.vmware.com/servicebinding-workload:
+    \"true\"\n  labels: #@ merge_labels({ \"app.kubernetes.io/component\": \"run\",
+    \"carto.run/workload-name\": data.values.workload.metadata.name })\nspec:\n  selector:\n
+    \   matchLabels: #@ data.values.config.metadata.labels\n  template: #@ data.values.config\n---\napiVersion:
+    v1\nkind: Service\nmetadata:\n  name: #@ data.values.workload.metadata.name\n
+    \ labels: #@ merge_labels({ \"app.kubernetes.io/component\": \"run\", \"carto.run/workload-name\":
+    data.values.workload.metadata.name })\nspec:\n  selector: #@ data.values.config.metadata.labels\n
+    \ ports:\n  #@ hasattr(data.values.params, \"ports\") and len(data.values.params.ports)
+    or assert.fail(\"one or more ports param must be provided.\")\n  #@ declared_ports
+    = {}\n  #@ if \"ports\" in data.values.params:\n  #@   declared_ports = data.values.params.ports\n
+    \ #@ else:\n  #@   declared_ports = struct.encode([{ \"containerPort\": 8080,
+    \"port\": 8080, \"name\": \"http\"}])\n  #@ end\n  #@ for p in merge_ports(declared_ports,
+    data.values.config.spec.containers):\n  - #@ p\n  #@ end\n#@ end\n\n---\napiVersion:
+    v1\nkind: ConfigMap\nmetadata:\n  name: #@ data.values.workload.metadata.name
+    + \"-server\"\n  labels: #@ merge_labels({ \"app.kubernetes.io/component\": \"config\"
+    })\ndata:\n  delivery.yml: #@ yaml.encode(delivery())"

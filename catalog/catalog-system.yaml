@@ -1,0 +1,13 @@
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: surfers-system
+  #namespace: default
+  description: Surfers Lookout Web System
+spec:
+  owner: group:surfers-crew
+  domain: surfers-domain
+
+---
