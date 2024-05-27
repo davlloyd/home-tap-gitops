@@ -4,7 +4,7 @@ apiVersion: backstage.io/v1alpha1
 kind: System
 metadata:
   name: surfers-system
-  #namespace: default
+  namespace: alpha
   description: Surfers Lookout Web System
 spec:
   owner: group:surfers-crew

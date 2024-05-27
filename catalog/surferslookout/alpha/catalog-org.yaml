@@ -4,7 +4,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Location
 metadata:
   name: surfers-location
-  #namespace: default
+  namespace: alpha
 spec:
   type: url
   targets:

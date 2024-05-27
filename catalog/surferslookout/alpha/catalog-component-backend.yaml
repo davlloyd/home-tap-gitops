@@ -4,7 +4,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: surfersapi
-  #namespace: default
+  namespace: alpha
   description: API Gateway for SurfersLookout application to external systems
   tags:
     - app-accelerator
@@ -20,4 +20,4 @@ spec:
   owner: group:surfers-crew
   system: surfers-system
   providesApis:
-    - surfersapi.tap1.home.alpha.tanzu.rocks
+    - surfersapi.alpha.tap1.home.tanzu.rocks

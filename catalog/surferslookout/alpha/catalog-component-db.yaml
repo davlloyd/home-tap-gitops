@@ -4,7 +4,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: surferslookout-db
-  #namespace: default
+  namespace: alpha
   description: Database service for SurfersLookout application
   annotations:
     backstage.io/kubernetes-id: surferslookout-db
