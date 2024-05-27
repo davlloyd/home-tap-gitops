@@ -4,7 +4,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: surfersweb
-  #namespace: default
+  namespace: alpha
   description: Web Frontend SurfersLookout application
   tags:
     - app-accelerator
@@ -23,5 +23,5 @@ spec:
     - component:surferslookout-db
     - component:surfersapi
   consumesApis:
-    - surfersapi.alpha.tap1.home.tanzu.rocks
+    - alpha/surfersapi
   

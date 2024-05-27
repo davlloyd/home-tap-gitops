@@ -20,4 +20,4 @@ spec:
   owner: group:surfers-crew
   system: surfers-system
   providesApis:
-    - surfersapi.alpha.tap1.home.tanzu.rocks
+    - alpha/surfersapi
