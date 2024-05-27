@@ -43,4 +43,4 @@ spec:
       title: SurfersLookout API
       description: "Surferslookout forecast api"
     servers:
-      - url: http://surfersapi.alpha.tap.home.tanzu.rocks/api/v1/api-docs
+      - url: https://surfersapi.alpha.apps.tap1.home.tanzu.rocks/api/v1/api-docs
