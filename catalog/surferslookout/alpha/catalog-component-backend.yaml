@@ -21,3 +21,31 @@ spec:
   system: surfers-system
   providesApis:
     - alpha/surfersapi
+
+--- 
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: surfersapi
+  namespace: alpha
+  description: API Defintiion for backend
+spec:
+  type: openapi
+  lifecycle: experimental
+  owner: group:surfers-crew
+  system: surfers-system
+  definition: |
+    openapi: "3.0.0"
+    info:
+      version: 1.0.0
+      title: Artist API
+      license:
+        name: MIT
+    servers:
+      - url: http://artist.spotify.net/v1
+    paths:
+      /artists:
+        get:
+          summary: List all artists
+    ...
