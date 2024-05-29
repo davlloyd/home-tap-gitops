@@ -1,7 +1,0 @@
-apiVersion: tekton.dev/v1
-kind: Pipeline
-metadata:
-    name: no-op
-spec:
-    description: |
-        No-op
