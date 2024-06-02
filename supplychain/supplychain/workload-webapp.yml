@@ -1,0 +1,86 @@
+apiVersion: supplychains.tanzu.vmware.com/v1alpha1
+kind: WebApp
+metadata:
+  name: surfersapi
+spec:
+  #! Kpack build specification
+  build:
+    env:
+      #! Required
+    - name: ""
+      #! Required
+      value: ""
+  #! Configuration for the generated Carvel Package
+  carvel:
+    #! The name of the Carvel Package. Combines with spec.carvel.packageDomain to create the Package refName. If set to "", will use the workload name.
+    packageName: ""
+  #! May contain an optional array of objects. Each object is a pair of keys: `name` and either `value` or `valueFrom`.
+  #! The Conventions component will translate these values into environment variables in the output object.
+  env:
+    #! The name of the environment variable that will be added to the Pod template spec.
+    #! Required
+  - name: ""
+    #! The literal value of the environment variable.
+    #! Note that `value` and `valueFrom` are mutually exclusive; you can only have one per item.
+    value: ""
+    #! Specifies a non-literal souce for the environment variable's value.
+    valueFrom:
+      #! Select a value from a `ConfigMap`.
+      configMapKeyRef:
+        #! The key to select.
+        key: ""
+        #! The name of the referent.
+        name: ""
+        #! Specify whether the ConfigMap or its key must be defined.
+        optional:
+      #! Selects a field of the pod.
+      fieldRef:
+        #! Version of the schema the FieldPath is written in terms of.
+        apiVersion: ""
+        #! Path of the field to select in the specified API version.
+        fieldPath: ""
+      #! Selects a resource of the container.
+      resourceFieldRef:
+        #! Resource to select.
+        resource: ""
+        #! Container name: required for volumes, optional for env vars.
+        containerName: ""
+        #! Specifies the output format of the exposed resources.
+        divisor: ""
+      #! Selects a key of a secret in the pod's namespace.
+      secretKeyRef:
+        #! The key of the secret to select from. Must be a valid secret key.
+        key: ""
+        #! The name of the referent.
+        name: ""
+        #! Specify whether the Secret or its key must be defined.
+        optional:
+  #! Configuration for the registry to use
+  registry:
+    #! The name of the repository
+    #! Required
+    repository: ""
+    #! The name of the registry server, e.g. docker.io
+    #! Required
+    server: ""
+  source:
+    #! Use this object to retrieve source from a git repository.
+    #! The tag, commit and branch fields are mutually exclusive, use only one.
+    #! Required
+    git:
+      #! A git tag ref to watch for new source
+      tag: ""
+      #! The url to the git source repository
+      #! Required
+      url: ""
+      #! A git branch ref to watch for new source
+      branch: ""
+      #! A git commit sha to use
+      commit: ""
+    #! path inside the source to build from (build has no access to paths above the subPath)
+    subPath: ""
+  #! The path to the yaml to be applied to the cluster.
+  subPath:
+    #! The path to the yaml to be applied to the cluster
+    #! Required
+    path: ""

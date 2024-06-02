@@ -1,0 +1,308 @@
+apiVersion: supply-chain.apps.tanzu.vmware.com/v1alpha1
+kind: SupplyChain
+metadata:
+    name: webapp
+spec:
+    defines:
+        group: supplychains.tanzu.vmware.com
+        kind: WebApp
+        plural: webapps
+        version: v1alpha1
+    description: General Web Application Supply Chain
+    stages:
+        - componentRef:
+            name: source-git-provider-1.0.0
+          name: source-git-provider
+          securityContext:
+            runAs: workload
+        - componentRef:
+            name: buildpack-build-1.0.0
+          name: buildpack-build
+        - componentRef:
+            name: conventions-1.0.0
+          name: conventions
+        - componentRef:
+            name: app-config-web-1.0.0
+          name: app-config-web
+        - componentRef:
+            name: carvel-package-1.0.0
+          name: carvel-package
+        - componentRef:
+            name: git-writer-1.0.0
+          name: git-writer
+        - componentRef:
+            name: deployer-1.0.0
+          name: deployer
+
+    config:
+      overrides:
+        # Platform Engineer provided registry overrides
+        # - path: spec.registry.repository
+        #   value: "YOUR-REGISTRY-REPO"
+        # - path: spec.registry.server
+        #   value: "YOUR-REGISTRY-SERVER"
+
+        # Platform Engineer provided build overrides
+        - path: spec.build.builder.kind
+          value: clusterbuilder
+        - path: spec.build.builder.name
+          value: full-jammy
+        - path: spec.build.cache.enabled
+          value: false
+        - path: spec.build.cache.image
+          value: ""
+        - path: spec.build.serviceAccountName
+          value: default
+        
+        # Platform Engineer provided carvel package component overrides
+        - path: spec.carvel.caCertData
+          value: ""
+        - path: spec.carvel.iaasAuthEnabled
+          value: false
+        - path: spec.carvel.packageDomain
+          value: "default.tap"
+        - path: spec.carvel.serviceAccountName
+          value: "default"
+        - path: spec.carvel.valuesSecretName
+          value: ""
+
+        # Platform Engineer provided GitOps repo overrides
+        - path: spec.gitOps.branch
+          value: main
+        - path: spec.gitOps.subPath
+          value: ""
+        - path: spec.gitOps.url
+          value: "https://github.com/davlloyd/tap-gitops-home-2"
+
+        # Import secret
+        # The name of the referent.
+        #- path: spec.env.valueFrom.secretKeyRef.name
+        #  value: pivnet
+        # Specify whether the Secret or its key must be defined.
+        #- path: spec.env.valueFrom.secretKeyRef.optional
+        #  value: false
+
+
+
+    #   overrides:
+    #       # builder kind
+    #       - path: spec.build.builder.kind
+    #         value: clusterbuilder
+    #       # builder name
+    #       - path: spec.build.builder.name
+    #         value: default
+    #       # whether to use a cache image
+    #       - path: spec.build.cache.enabled
+    #         value: false
+    #       # cache image to use
+    #       - path: spec.build.cache.image
+    #         value: ""
+    #       - path: spec.build.env.name
+    #         value: ""
+    #       - path: spec.build.env.value
+    #         value: ""
+    #       # Service account to use
+    #       - path: spec.build.serviceAccountName
+    #         value: default
+    #       # PEM encoded certificate data for the image registry where the files will be pushed to.
+    #       - path: spec.carvel.caCertData
+    #         value: false
+    #       # Enable the use of IAAS based authentication for imgpkg.
+    #       - path: spec.carvel.iaasAuthEnabled
+    #         value: false
+    #       # The domain of the Carvel Package. Combines with spec.carvel.packageName to create the Package refName. If set to "", will use "default.tap".
+    #       - path: spec.carvel.packageDomain
+    #         value: '""'
+    #       # The name of the Carvel Package. Combines with spec.carvel.packageDomain to create the Package refName. If set to "", will use the workload name.
+    #       - path: spec.carvel.packageName
+    #         value: '""'
+    #       # Service account that gives kapp-controller privileges to create resources in the namespace.
+    #       - path: spec.carvel.serviceAccountName
+    #         value: false
+    #       # Name of the values Secret that provides customized values to the package installation's templating steps.
+    #       - path: spec.carvel.valuesSecretName
+    #         value: false
+    #       # The name of the environment variable that will be added to the Pod template spec.
+    #       - path: spec.env.name
+    #         value: ""
+    #       # The literal value of the environment variable.
+    #       # Note that `value` and `valueFrom` are mutually exclusive; you can only have one per item.
+    #       - path: spec.env.value
+    #         value: ""
+    #       # The key to select.
+    #       - path: spec.env.valueFrom.configMapKeyRef.key
+    #         value: ""
+    #       # The name of the referent.
+    #       - path: spec.env.valueFrom.configMapKeyRef.name
+    #         value: ""
+    #       # Specify whether the ConfigMap or its key must be defined.
+    #       - path: spec.env.valueFrom.configMapKeyRef.optional
+    #         value: false
+    #       # Version of the schema the FieldPath is written in terms of.
+    #       - path: spec.env.valueFrom.fieldRef.apiVersion
+    #         value: ""
+    #       # Path of the field to select in the specified API version.
+    #       - path: spec.env.valueFrom.fieldRef.fieldPath
+    #         value: ""
+    #       # Container name: required for volumes, optional for env vars.
+    #       - path: spec.env.valueFrom.resourceFieldRef.containerName
+    #         value: ""
+    #       # Specifies the output format of the exposed resources.
+    #       - path: spec.env.valueFrom.resourceFieldRef.divisor
+    #         value: ""
+    #       # Resource to select.
+    #       - path: spec.env.valueFrom.resourceFieldRef.resource
+    #         value: ""
+    #       # The key of the secret to select from. Must be a valid secret key.
+    #       - path: spec.env.valueFrom.secretKeyRef.key
+    #         value: false
+    #       # The name of the referent.
+    #       - path: spec.env.valueFrom.secretKeyRef.name
+    #         value: false
+    #       # Specify whether the Secret or its key must be defined.
+    #       - path: spec.env.valueFrom.secretKeyRef.optional
+    #         value: false
+    #       # the branch to commit changes to
+    #       - path: spec.gitOps.branch
+    #         value: main
+    #       # the relative path within the gitops repository to add the package configuration to.
+    #       - path: spec.gitOps.subPath
+    #         value: ""
+    #       # the repository to push the pull request to
+    #       - path: spec.gitOps.url
+    #         value: ""
+    #       # The repository to use
+    #       - path: spec.registry.repository
+    #         value: ""
+    #       # The registry address
+    #       - path: spec.registry.server
+    #         value: ""
+    #       # A git branch ref to watch for new source
+    #       - path: spec.source.git.branch
+    #         value: ""
+    #       # A git commit sha to use
+    #       - path: spec.source.git.commit
+    #         value: ""
+    #       # A git tag ref to watch for new source
+    #       - path: spec.source.git.tag
+    #         value: ""
+    #       # The url to the git source repository
+    #       - path: spec.source.git.url
+    #         value: ""
+    #       # The sub path in the bundle to locate source code
+    #       - path: spec.source.subPath
+    #         value: ""
+    #       # The path to the yaml to be applied to the cluster
+    #       - path: spec.subPath.path
+    #         value: ""
+    #   defaults:
+    #       # builder kind
+    #       - path: spec.build.builder.kind
+    #         value: clusterbuilder
+    #       # builder name
+    #       - path: spec.build.builder.name
+    #         value: default
+    #       # whether to use a cache image
+    #       - path: spec.build.cache.enabled
+    #         value: false
+    #       # cache image to use
+    #       - path: spec.build.cache.image
+    #         value: ""
+    #       - path: spec.build.env.name
+    #         value: ""
+    #       - path: spec.build.env.value
+    #         value: ""
+    #       # Service account to use
+    #       - path: spec.build.serviceAccountName
+    #         value: default
+    #       # PEM encoded certificate data for the image registry where the files will be pushed to.
+    #       - path: spec.carvel.caCertData
+    #         value: false
+    #       # Enable the use of IAAS based authentication for imgpkg.
+    #       - path: spec.carvel.iaasAuthEnabled
+    #         value: false
+    #       # The domain of the Carvel Package. Combines with spec.carvel.packageName to create the Package refName. If set to "", will use "default.tap".
+    #       - path: spec.carvel.packageDomain
+    #         value: '""'
+    #       # The name of the Carvel Package. Combines with spec.carvel.packageDomain to create the Package refName. If set to "", will use the workload name.
+    #       - path: spec.carvel.packageName
+    #         value: '""'
+    #       # Service account that gives kapp-controller privileges to create resources in the namespace.
+    #       - path: spec.carvel.serviceAccountName
+    #         value: false
+    #       # Name of the values Secret that provides customized values to the package installation's templating steps.
+    #       - path: spec.carvel.valuesSecretName
+    #         value: false
+    #       # The name of the environment variable that will be added to the Pod template spec.
+    #       - path: spec.env.name
+    #         value: ""
+    #       # The literal value of the environment variable.
+    #       # Note that `value` and `valueFrom` are mutually exclusive; you can only have one per item.
+    #       - path: spec.env.value
+    #         value: ""
+    #       # The key to select.
+    #       - path: spec.env.valueFrom.configMapKeyRef.key
+    #         value: ""
+    #       # The name of the referent.
+    #       - path: spec.env.valueFrom.configMapKeyRef.name
+    #         value: ""
+    #       # Specify whether the ConfigMap or its key must be defined.
+    #       - path: spec.env.valueFrom.configMapKeyRef.optional
+    #         value: false
+    #       # Version of the schema the FieldPath is written in terms of.
+    #       - path: spec.env.valueFrom.fieldRef.apiVersion
+    #         value: ""
+    #       # Path of the field to select in the specified API version.
+    #       - path: spec.env.valueFrom.fieldRef.fieldPath
+    #         value: ""
+    #       # Container name: required for volumes, optional for env vars.
+    #       - path: spec.env.valueFrom.resourceFieldRef.containerName
+    #         value: ""
+    #       # Specifies the output format of the exposed resources.
+    #       - path: spec.env.valueFrom.resourceFieldRef.divisor
+    #         value: ""
+    #       # Resource to select.
+    #       - path: spec.env.valueFrom.resourceFieldRef.resource
+    #         value: ""
+    #       # The key of the secret to select from. Must be a valid secret key.
+    #       - path: spec.env.valueFrom.secretKeyRef.key
+    #         value: false
+    #       # The name of the referent.
+    #       - path: spec.env.valueFrom.secretKeyRef.name
+    #         value: false
+    #       # Specify whether the Secret or its key must be defined.
+    #       - path: spec.env.valueFrom.secretKeyRef.optional
+    #         value: false
+    #       # the branch to commit changes to
+    #       - path: spec.gitOps.branch
+    #         value: main
+    #       # the relative path within the gitops repository to add the package configuration to.
+    #       - path: spec.gitOps.subPath
+    #         value: ""
+    #       # the repository to push the pull request to
+    #       - path: spec.gitOps.url
+    #         value: ""
+    #       # The repository to use
+    #       - path: spec.registry.repository
+    #         value: ""
+    #       # The registry address
+    #       - path: spec.registry.server
+    #         value: ""
+    #       # A git branch ref to watch for new source
+    #       - path: spec.source.git.branch
+    #         value: ""
+    #       # A git commit sha to use
+    #       - path: spec.source.git.commit
+    #         value: ""
+    #       # A git tag ref to watch for new source
+    #       - path: spec.source.git.tag
+    #         value: ""
+    #       # The url to the git source repository
+    #       - path: spec.source.git.url
+    #         value: ""
+    #       # The sub path in the bundle to locate source code
+    #       - path: spec.source.subPath
+    #         value: ""
+    #       # The path to the yaml to be applied to the cluster
+    #       - path: spec.subPath.path
+    #         value: ""
