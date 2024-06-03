@@ -74,6 +74,12 @@ spec:
         - path: spec.gitOps.url
           value: "https://github.com/davlloyd/tap-gitops-home-2"
 
+        # Platform Engineer provided registry address details
+        - path: spec.registry.repository
+          value: "tap"
+        - path: spec.registry.server
+          value: harbor.home.tanzu.rocks
+
         # Import secret
         # The name of the referent.
         #- path: spec.env.valueFrom.secretKeyRef.name
