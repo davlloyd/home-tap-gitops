@@ -33,18 +33,18 @@ spec:
     templateRef:
       kind: ClusterSourceTemplate
       name: testing-pipeline
-  - name: source-scanner
-    params:
-    - default: scan-policy
-      name: scanning_source_policy
-    - default: blob-source-scan-template
-      name: scanning_source_template
-    sources:
-    - name: source
-      resource: source-tester
-    templateRef:
-      kind: ClusterSourceTemplate
-      name: source-scanner-template
+  # - name: source-scanner
+  #   params:
+  #   - default: scan-policy
+  #     name: scanning_source_policy
+  #   - default: blob-source-scan-template
+  #     name: scanning_source_template
+  #   sources:
+  #   - name: source
+  #     resource: source-tester
+  #   templateRef:
+  #     kind: ClusterSourceTemplate
+  #     name: source-scanner-template
   - name: image-provider
     params:
     - name: serviceAccount
@@ -53,7 +53,7 @@ spec:
       value:
         ca_cert_data: ""
         repository: tap/supply-chain
-        server: harbor.services.tanzu.rocks
+        server: harbor.home.tanzu.rocks
     - default: default
       name: clusterBuilder
     - default: ./Dockerfile
@@ -64,7 +64,7 @@ spec:
       name: docker_build_extra_args
     sources:
     - name: source
-      resource: source-scanner
+      resource: source-tester
     templateRef:
       kind: ClusterImageTemplate
       options:
@@ -132,7 +132,7 @@ spec:
       value:
         ca_cert_data: ""
         repository: tap/supply-chain
-        server: harbor.services.tanzu.rocks
+        server: harbor.home.tanzu.rocks
     templateRef:
       kind: ClusterTemplate
       name: config-writer-template
@@ -142,7 +142,7 @@ spec:
       value:
         ca_cert_data: ""
         repository: tap/supply-chain
-        server: harbor.services.tanzu.rocks
+        server: harbor.home.tanzu.rocks
     templateRef:
       kind: ClusterTemplate
       name: deliverable-template
